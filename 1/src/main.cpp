@@ -7,40 +7,32 @@ int main() {
         return 1;
     }
 
-    int x = 50; 
-    int count = 0; 
+    int x = 50;
+    int count = 0;
     std::string line;
 
     while (std::getline(input, line)) {
-        char direction = line[0];
-        int amount = std::stoi(&line[1]); 
+        int sign = (line[0] == 'R') ? 1 : -1;
+        int amount = std::stoi(&line[1]);
         int remainder = amount;
 
-        if (direction == 'L') {
-            while (remainder > 0) {
-                int distanceToZero = (x == 0) ? 100 : x;
-
-                if (remainder >= distanceToZero) {
-                    count++;
-                    remainder -= distanceToZero;
-                    x = 0; 
-                } else {
-                    x = (x == 0) ? (100 - remainder) : (x - remainder);
-                    remainder = 0;
-                }
+        while (remainder > 0) {
+            int dist;
+            if (x == 0) {
+                dist = 100; 
+            } else {
+                dist = (sign == 1) ? (100 - x) : x;
             }
-        } else {
-            while (remainder > 0) {
-                int distanceToZero = (x == 0) ? 100 : (100 - x);
 
-                if (remainder >= distanceToZero) {
-                    count++;
-                    remainder -= distanceToZero;
-                    x = 0;
-                } else {
-                    x += remainder;
-                    remainder = 0;
-                }
+            if (remainder >= dist) {
+                count++;
+                remainder -= dist;
+                x = 0;
+            } else {
+                x += sign * remainder;            
+                if (x < 0) x += 100;
+                
+                remainder = 0;
             }
         }
     }
