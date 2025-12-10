@@ -18,7 +18,7 @@ int main() {
         if (direction == 'L') {
             x = (x + amount) % 100;
         } else {
-            x = ((x - amount) % 100 + 100) % 100;
+            x = (x - amount) % 100;
         }
         
         if (x == 0) ++count;
