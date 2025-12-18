@@ -24,7 +24,6 @@ func main() {
 	if err != nil {
 		return
 	}
-
 	defer f.Close()
 
 	sc := bufio.NewScanner(f)
@@ -35,19 +34,13 @@ func main() {
 			break
 		}
 	}
-
 	if err := sc.Err(); err != nil {
-		return
-	}
-
-	if line == "" {
-		fmt.Println(0)
-		fmt.Printf("elapsed: %v\n", time.Since(start))
 		return
 	}
 
 	type interval struct{ lo, hi int64 }
 	var ranges []interval
+
 	for _, part := range strings.Split(line, ",") {
 		part = strings.TrimSpace(part)
 		if part == "" {
@@ -65,36 +58,45 @@ func main() {
 		ranges = append(ranges, interval{lo, hi})
 	}
 
-		seen := make(map[int64]struct{})
+	seen := make(map[int64]struct{})
 	var sum int64
 
 	for _, rg := range ranges {
 		L, R := rg.lo, rg.hi
-		for k := 1; k <= 9; k++ { 
+
+		for k := 1; k <= 9; k++ {
 			pow := pow10(k)
-			minHalf := pow / 10
-			maxHalf := pow - 1
-			d := pow + 1 
+			minPattern := pow / 10
+			maxPattern := pow - 1
 
-			low := (L + d - 1) / d
-			high := R / d
+			for r := 2; k*r <= 18; r++ {
+				var M int64
+				powerOfTen := int64(1)
+				for i := 0; i < r; i++ {
+					M += powerOfTen
+					powerOfTen *= pow
+				}
 
-			if low < minHalf {
-				low = minHalf
-			}
-			if high > maxHalf {
-				high = maxHalf
-			}
-			if low > high {
-				continue
-			}
+				low := (L + M - 1) / M
+				high := R / M
 
-			for a := low; a <= high; a++ {
-				val := a*pow + a
-				if val >= L && val <= R {
-					if _, ok := seen[val]; !ok {
-						seen[val] = struct{}{}
-						sum += val
+				if low < minPattern {
+					low = minPattern
+				}
+				if high > maxPattern {
+					high = maxPattern
+				}
+				if low > high {
+					continue
+				}
+
+				for pattern := low; pattern <= high; pattern++ {
+					val := pattern * M
+					if val >= L && val <= R {
+						if _, ok := seen[val]; !ok {
+							seen[val] = struct{}{}
+							sum += val
+						}
 					}
 				}
 			}
